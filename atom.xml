@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Scorpiodeng&#39;s Blog</title>
+  <subtitle>The best preparation for tomorrow is doing your best today.</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://blog.scorpiodeng.me/"/>
+  <updated>2016-12-01T10:43:13.696Z</updated>
+  <id>http://blog.scorpiodeng.me/</id>
+  
+  <author>
+    <name>Scorpio Dun</name>
+    <email>scorpio_dxledu@163.com</email>
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>从前慢</title>
+    <link href="http://blog.scorpiodeng.me/2016/12/01/%E4%BB%8E%E5%89%8D%E6%85%A2/"/>
+    <id>http://blog.scorpiodeng.me/2016/12/01/从前慢/</id>
+    <published>2016-12-01T10:31:19.000Z</published>
+    <updated>2016-12-01T10:43:13.696Z</updated>
+    
+    <content type="html"><![CDATA[<p>记得早先年少时<br>大家诚诚恳恳<br>说一句 是一句</p>
+<p>清早上火车站<br>长街黑暗无行人<br>卖豆浆的小店冒着热气</p>
+<p>从前的日色变得慢<br>车,马,邮件都慢<br>一生只够爱一个人</p>
+<p>从前的锁也好看<br>钥匙精美有样子<br>你锁了 人家就懂了</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;记得早先年少时&lt;br&gt;大家诚诚恳恳&lt;br&gt;说一句 是一句&lt;/p&gt;
+&lt;p&gt;清早上火车站&lt;br&gt;长街黑暗无行人&lt;br&gt;卖豆浆的小店冒着热气&lt;/p&gt;
+&lt;p&gt;从前的日色变得慢&lt;br&gt;车,马,邮件都慢&lt;br&gt;一生只够爱一个人&lt;/p&gt;
+&lt;p&gt;从前的锁也好看&lt;br&gt;钥匙精美有样子&lt;br&gt;
+    
+    </summary>
+    
+      <category term="日志" scheme="http://blog.scorpiodeng.me/categories/%E6%97%A5%E5%BF%97/"/>
+    
+    
+      <category term="开始" scheme="http://blog.scorpiodeng.me/tags/%E5%BC%80%E5%A7%8B/"/>
+    
+      <category term="我" scheme="http://blog.scorpiodeng.me/tags/%E6%88%91/"/>
+    
+      <category term="日记" scheme="http://blog.scorpiodeng.me/tags/%E6%97%A5%E8%AE%B0/"/>
+    
+  </entry>
+  
+</feed>
