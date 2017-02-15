@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Scorpio Deng&#39;s Blog</title>
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://blog.scorpiodeng.me/"/>
+  <updated>2017-02-15T16:19:22.149Z</updated>
+  <id>http://blog.scorpiodeng.me/</id>
+  
+  <author>
+    <name>Scorpio Deng</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Cookie与Session的区别</title>
+    <link href="http://blog.scorpiodeng.me/2017/02/16/Cookie%E4%B8%8ESession%E7%9A%84%E5%8C%BA%E5%88%AB/"/>
+    <id>http://blog.scorpiodeng.me/2017/02/16/Cookie与Session的区别/</id>
+    <published>2017-02-15T16:04:31.000Z</published>
+    <updated>2017-02-15T16:19:22.149Z</updated>
+    
+    <content type="html"><![CDATA[<p>针对会话机制，本文分别对Cookie与Session做一个介绍和总结，并分别对两个知识点进行对比分析。</p>
+<h3 id="Cookie机制"><a href="#Cookie机制" class="headerlink" title="Cookie机制"></a>Cookie机制</h3><p>Cookies是服务器在本地机器上存储的小段文本并随每一个请求发送至同一个服务器。IETF RFC 2965 HTTP State Management Mechanism 是通用cookie规范。网络服务器用HTTP头向客户端发送cookies，在客户终端，浏览器解析这些cookies并将它们保存为一个本地文件，它会自动将同一服务器的任何请求缚上这些cookies 。</p>
+<p>正统的cookie分发是通过扩展HTTP协议来实现的，服务器通过在HTTP的响应头中加上一行特殊的指示以提示浏览器按照指示生成相应的cookie。然而纯粹的客户端脚本如JavaScript也可以生成cookie。而cookie的使用是由浏览器按照一定的原则在后台自动发送给服务器的。浏览器检查所有存储的cookie，如果某个cookie所声明的作用范围大于等于将要请求的资源所在的位置，则把该cookie附在请求资源的HTTP请求头上发送给服务器。<br><a id="more"></a><br>cookie的内容主要包括：名字，值，过期时间，路径和域。路径与域一起构成cookie的作用范围。若不设置过期时间，则表示这个cookie的生命期为浏览器会话期间，关闭浏览器窗口，cookie就消失。这种生命期为浏览器会话期的cookie被称为会话cookie。会话cookie一般不存储在硬盘上而是保存在内存里，当然这种行为并不是规范规定的。若设置了过期时间，浏览器就会把cookie保存到硬盘上，关闭后再次打开浏览器，这些cookie仍然有效直到超过设定的过期时间。存储在硬盘上的cookie可以在不同的浏览器进程间共享，比如两个IE窗口。而对于保存在内存里的cookie，不同的浏览器有不同的处理方式。</p>
+<p>而session机制采用的是一种在服务器端保持状态的解决方案。同时我们也看到，由于采用服务器端保持状态的方案在客户端也需要保存一个标识，所以session机制可能需要借助于cookie机制来达到保存标识的目的。而session提供了方便管理全局变量的方式 。</p>
+<p>session是针对每一个用户的，变量的值保存在服务器上，用一个sessionID来区分是哪个用户session变量,这个值是通过用户的浏览器在访问的时候返回给服务器，当客户禁用cookie时，这个值也可能设置为由get来返回给服务器。</p>
+<p>就安全性来说：当你访问一个使用session 的站点，同时在自己机子上建立一个cookie，建议在服务器端的session机制更安全些，因为它不会任意读取客户存储的信息。</p>
+<h3 id="Session机制"><a href="#Session机制" class="headerlink" title="Session机制"></a>Session机制</h3><p>session机制是一种服务器端的机制，服务器使用一种类似于散列表的结构（也可能就是使用散列表）来保存信息。</p>
+<p>当程序需要为某个客户端的请求创建一个session时，服务器首先检查这个客户端的请求里是否已包含了一个session标识（称为session id），如果已包含则说明以前已经为此客户端创建过session，服务器就按照session id把这个session检索出来使用（检索不到，会新建一个），如果客户端请求不包含session id，则为此客户端创建一个session并且生成一个与此session相关联的session id，session id的值应该是一个既不会重复，又不容易被找到规律以仿造的字符串，这个session id将被在本次响应中返回给客户端保存。</p>
+<p>保存这个session id的方式可以采用cookie，这样在交互过程中浏览器可以自动的按照规则把这个标识发挥给服务器。一般这个cookie的名字都是类似于SEEESIONID。但cookie可以被人为的禁止，则必须有其他机制以便在cookie被禁止时仍然能够把session id传递回服务器。</p>
+<p>经常被使用的一种技术叫做URL重写，就是把session id直接附加在URL路径的后面。还有一种技术叫做表单隐藏字段。就是服务器会自动修改表单，添加一个隐藏字段，以便在表单提交时能够把session id传递回服务器。</p>
+<p>Cookie与Session都能够进行会话跟踪，但是完成的原理不太一样。普通状况下二者均能够满足需求，但有时分不能够运用Cookie，有时分不能够运用Session。下面经过比拟，阐明二者的特性以及适用的场所:</p>
+<ul>
+<li><strong>存取方式</strong></li>
+</ul>
+<p>Cookie中只能保管ASCII字符串，假如需求存取Unicode字符或者二进制数据，需求先进行编码。Cookie中也不能直接存取Java对象。若要存储略微复杂的信息，运用Cookie是比拟艰难的。</p>
+<p>而Session中能够存取任何类型的数据，包括而不限于String、Integer、List、Map等。Session中也能够直接保管Java Bean乃至任何Java类，对象等，运用起来十分便当。能够把Session看做是一个Java容器类。</p>
+<ul>
+<li><strong>隐私策略</strong></li>
+</ul>
+<p>Cookie存储在客户端阅读器中，对客户端是可见的，客户端的一些程序可能会窥探、复制以至修正Cookie中的内容。而Session存储在服务器上，对客户端是透明的，不存在敏感信息泄露的风险。</p>
+<p>假如选用Cookie，比较好的方法是，敏感的信息如账号密码等尽量不要写到Cookie中。最好是像Google、Baidu那样将Cookie信息加密，提交到服务器后再进行解密，保证Cookie中的信息只要本人能读得懂。而假如选择Session就省事多了，反正是放在服务器上，Session里任何隐私都能够有效的保护。</p>
+<ul>
+<li><strong>有效期</strong></li>
+</ul>
+<p>使用过Google的人都晓得，假如登录过Google，则Google的登录信息长期有效。用户不用每次访问都重新登录，Google会持久地记载该用户的登录信息。要到达这种效果，运用Cookie会是比较好的选择。只需要设置Cookie的过期时间属性为一个很大很大的数字。</p>
+<p>由于Session依赖于名为JSESSIONID的Cookie，而Cookie JSESSIONID的过期时间默许为–1，只需关闭了阅读器该Session就会失效，因而Session不能完成信息永世有效的效果。运用URL地址重写也不能完成。而且假如设置Session的超时时间过长，服务器累计的Session就会越多，越容易招致内存溢出。</p>
+<ul>
+<li><strong>跨域支持</strong></li>
+</ul>
+<p>Cookie支持跨域名访问，例如将domain属性设置为“.biaodianfu.com”，则以“.biaodianfu.com”为后缀的一切域名均能够访问该Cookie。跨域名Cookie如今被普遍用在网络中，例如Google、Baidu、Sina等。而Session则不会支持跨域名访问。Session仅在他所在的域名内有效。</p>
+<p>仅运用Cookie或者仅运用Session可能完成不了理想的效果。这时应该尝试一下同时运用Cookie与Session。Cookie与Session的搭配运用在实践项目中会完成很多意想不到的效果。</p>
+<ul>
+<li><strong>浏览器支持</strong></li>
+</ul>
+<p>Cookie是需要客户端浏览器支持的。假如客户端禁用了Cookie，或者不支持Cookie，则会话跟踪会失效。关于WAP上的应用，常规的Cookie就派不上用场了。</p>
+<p>假如客户端浏览器不支持Cookie，需要运用Session以及URL地址重写。需要注意的是一切的用到Session程序的URL都要进行URL地址重写，否则Session会话跟踪还会失效。关于WAP应用来说，Session+URL地址重写或许是它唯一的选择。</p>
+<p>假如客户端支持Cookie，则Cookie既能够设为本浏览器窗口以及子窗口内有效（把过期时间设为–1），也能够设为一切阅读器窗口内有效（把过期时间设为某个大于0的整数）。但Session只能在本阅读器窗口以及其子窗口内有效。假如两个浏览器窗口互不相干，它们将运用两个不同的Session。</p>
+<ul>
+<li><strong>服务器压力</strong></li>
+</ul>
+<p>Session是保管在服务器端的，每个用户都会产生一个Session。假如并发访问的用户十分多，会产生十分多的Session，耗费大量的内存。因而像Google、Baidu、Sina这样并发访问量极高的网站，是不太可能运用Session来追踪客户会话的。</p>
+<p>而Cookie保管在客户端，不占用服务器资源。假如并发阅读的用户十分多，Cookie是很好的选择。关于Google、Baidu、Sina来说，Cookie或许是唯一的选择。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;针对会话机制，本文分别对Cookie与Session做一个介绍和总结，并分别对两个知识点进行对比分析。&lt;/p&gt;
+&lt;h3 id=&quot;Cookie机制&quot;&gt;&lt;a href=&quot;#Cookie机制&quot; class=&quot;headerlink&quot; title=&quot;Cookie机制&quot;&gt;&lt;/a&gt;Cookie机制&lt;/h3&gt;&lt;p&gt;Cookies是服务器在本地机器上存储的小段文本并随每一个请求发送至同一个服务器。IETF RFC 2965 HTTP State Management Mechanism 是通用cookie规范。网络服务器用HTTP头向客户端发送cookies，在客户终端，浏览器解析这些cookies并将它们保存为一个本地文件，它会自动将同一服务器的任何请求缚上这些cookies 。&lt;/p&gt;
+&lt;p&gt;正统的cookie分发是通过扩展HTTP协议来实现的，服务器通过在HTTP的响应头中加上一行特殊的指示以提示浏览器按照指示生成相应的cookie。然而纯粹的客户端脚本如JavaScript也可以生成cookie。而cookie的使用是由浏览器按照一定的原则在后台自动发送给服务器的。浏览器检查所有存储的cookie，如果某个cookie所声明的作用范围大于等于将要请求的资源所在的位置，则把该cookie附在请求资源的HTTP请求头上发送给服务器。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="JAVA" scheme="http://blog.scorpiodeng.me/categories/JAVA/"/>
+    
+    
+      <category term="笔记" scheme="http://blog.scorpiodeng.me/tags/%E7%AC%94%E8%AE%B0/"/>
+    
+      <category term="J2EE" scheme="http://blog.scorpiodeng.me/tags/J2EE/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>有关Java方法参数是引用调用还是值调用的问题</title>
+    <link href="http://blog.scorpiodeng.me/2017/02/15/%E6%9C%89%E5%85%B3Java%E6%96%B9%E6%B3%95%E5%8F%82%E6%95%B0%E6%98%AF%E5%BC%95%E7%94%A8%E8%B0%83%E7%94%A8%E8%BF%98%E6%98%AF%E5%80%BC%E8%B0%83%E7%94%A8%E7%9A%84%E9%97%AE%E9%A2%98/"/>
+    <id>http://blog.scorpiodeng.me/2017/02/15/有关Java方法参数是引用调用还是值调用的问题/</id>
+    <published>2017-02-15T14:42:27.563Z</published>
+    <updated>2017-02-15T16:14:54.896Z</updated>
+    
+    <content type="html"><![CDATA[<p><strong>方法调用(call by)</strong>是一个标准的计算机科学术语。方法调用根据参数传递的情况又分为<strong>值调用(call by reference)</strong>和<strong>引用调用(call by value)</strong>。江湖上有很多关于这两种调用的定义 ，最通常的说法是传递值的是值调用，传递地址的是引用调用。这其实很不恰当，这种这些说法很容易让我们联想到Java的对象参数传递是引用调用，实际上，<strong>Java的对象参数传递仍然是值调用</strong>。<br>我们首先用一段代码来证实一下为什么Java的对象参数传递是值调用。<br><img src="http://i.imgur.com/eC11PBw.png" alt=""><br><a id="more"></a><br>上面的结果让人很失望，虽然形参对象e1,e2的内容交换了，但实参对象worker,manager并没有互换内容。这里面最重要的原因就在于形参e1,e2是实参worker,manager的地址拷贝。</p>
+<p>大家都知道，在Java中对象变量名实际上代表的是对象在堆中的地址(专业术语叫做<strong>对象引用</strong>)。在Java方法调用的时候，参数传递的是对象的引用。重要的是，形参和实参所占的内存地址并不一样，形参中的内容只是实参中存储的对象引用的一份拷贝。</p>
+<p>如果大家对JVM内存管理中<strong>Java栈</strong>的<strong>局部变量区</strong>有所了解的话，就很好理解上面这句话。在JVM运行上面的程序时，运行main方法和swap方法，会在Java栈中先后push两个叫做<strong>栈帧</strong>的内存空间。main栈帧中有一块叫局部变量区的内存用来存储实参对象worker和manager的引用。而swap栈帧中的局部变量区则存储了形参对象e1和e2的引用。虽然e1和e2的引用值分别与worker和manager相同，但是它们占用了不同的内存空间。当e1和e2的引用发生交换时，下面的图很清晰的看出完全不会影响worker和manager的引用值。<br><img src="http://i.imgur.com/zUutMoy.png" alt=""><br>Java对象参数传递虽然传递的是地址(引用)，但仍然是值调用。</p>
+<p><strong>值调用(call by value)</strong>：在参数传递过程中，形参和实参占用了两个完全不同的内存空间。形参所存储的内容是实参存储内容的一份拷贝。实际上，Java对象的传递就符合这个定义，只不过形参和实参所储存的内容并不是常规意义上的变量值，而是变量的地址。</p>
+<p><strong>引用调用(call by reference)</strong>：在参数传递的过程中，形参和实参完全是同一块内存空间，两者不分彼此。实际上，形参名和实参名只是编程中的不同符号，在程序运行过程中，内存中存储的空间才是最重要的。不同的变量名并不能说明占用的内存存储空间不同。</p>
+<p>大体上说，两种调用的根本并不在于传递的是值还是地址(毕竟地址也是一个值)，而是在于形参和实参是否占用同一块内存空间。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;strong&gt;方法调用(call by)&lt;/strong&gt;是一个标准的计算机科学术语。方法调用根据参数传递的情况又分为&lt;strong&gt;值调用(call by reference)&lt;/strong&gt;和&lt;strong&gt;引用调用(call by value)&lt;/strong&gt;。江湖上有很多关于这两种调用的定义 ，最通常的说法是传递值的是值调用，传递地址的是引用调用。这其实很不恰当，这种这些说法很容易让我们联想到Java的对象参数传递是引用调用，实际上，&lt;strong&gt;Java的对象参数传递仍然是值调用&lt;/strong&gt;。&lt;br&gt;我们首先用一段代码来证实一下为什么Java的对象参数传递是值调用。&lt;br&gt;&lt;img src=&quot;http://i.imgur.com/eC11PBw.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;
+    
+    </summary>
+    
+      <category term="JAVA" scheme="http://blog.scorpiodeng.me/categories/JAVA/"/>
+    
+    
+      <category term="笔记" scheme="http://blog.scorpiodeng.me/tags/%E7%AC%94%E8%AE%B0/"/>
+    
+      <category term="J2EE" scheme="http://blog.scorpiodeng.me/tags/J2EE/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>有关Java中的静态与动态绑定机制</title>
+    <link href="http://blog.scorpiodeng.me/2017/02/15/%E6%9C%89%E5%85%B3Java%E4%B8%AD%E7%9A%84%E9%9D%99%E6%80%81%E4%B8%8E%E5%8A%A8%E6%80%81%E7%BB%91%E5%AE%9A%E6%9C%BA%E5%88%B6/"/>
+    <id>http://blog.scorpiodeng.me/2017/02/15/有关Java中的静态与动态绑定机制/</id>
+    <published>2017-02-15T10:00:06.000Z</published>
+    <updated>2017-02-15T16:17:14.847Z</updated>
+    
+    <content type="html"><![CDATA[<p> <strong>这篇文章主要分析的是JVM方法调用的静态(static binding)和动态绑定机制(auto binding)。</strong></p>
+<h3 id="静态绑定机制"><a href="#静态绑定机制" class="headerlink" title="静态绑定机制"></a>静态绑定机制</h3><p><img src="http://i.imgur.com/3ImTwYA.png" alt=""><br>上面的源代码中执行方法调用的语句(Father.f1())被编译器编译成了<br><a id="more"></a><br>一条指令：invokestatic #13。我们看看JVM是如何处理这条指令的：</p>
+<ul>
+<li><p>指令中的#13指的是StaticCall类的常量池中第13个常量表的索引项。这个常量表(<strong>CONSTATN_Methodref_info</strong>)记录的是方法f1信息的符号引用(包括f1所在的类名，方法名和返回类型)。JVM会首先根据这个符号引用找到方法f1所在的类的全限定名: hr.test.Father。</p>
+</li>
+<li><p>紧接着JVM会加载、链接和初始化Father类。</p>
+</li>
+<li><p>然后在Father类所在的方法区中找到f1()方法的直接地址，并将这个直接地址记录到StaticCall类的常量池索引为13的常量表中。这个过程叫<strong>常量池解析</strong>，以后再次调用Father.f1()时，将直接找到f1方法的字节码。</p>
+</li>
+<li><p>完成了StaticCall类常量池索引项13的常量表的解析之后，JVM就可以调用f1()方法，并开始解释执行f1()方法中的指令了。</p>
+</li>
+</ul>
+<p>通过上面的过程，我们发现经过常量池解析之后，JVM就能够确定要调用的f1()方法具体在内存的什么位置上了。实际上，这个信息在编译阶段就已经在StaticCall类的常量池中记录了下来。这种在编译阶段就能够确定调用哪个方法的方式，我们叫做<strong>静态绑定机制</strong>。</p>
+<p>除了被static修饰的静态方法，所有被private修饰的私有方法、被final修饰的禁止子类覆盖的方法都会被编译成invokestatic指令。另外所有类的初始化方法和会被编译成invokespecial指令。JVM会采用静态绑定机制来顺利的调用这些方法。</p>
+<h3 id="动态绑定机制"><a href="#动态绑定机制" class="headerlink" title="动态绑定机制"></a>动态绑定机制</h3><p><img src="http://i.imgur.com/AOiGG4s.png" alt=""><br>上面的源代码中有三个重要的概念：<strong>多态(polymorphism)、方法覆盖、方法重载</strong>。打印的结果大家也都比较清楚，但是JVM是如何知道f.f1()调用的是子类Sun中方法而不是Father中的方法呢？在解释这个问题之前，我们首先简单的讲下JVM管理的一个非常重要的数据结构——方法表。</p>
+<p>在JVM加载类的同时，会在方法区中为这个类存放很多信息。其中就有一个数据结构叫<strong>方法表</strong>。它以数组的形式记录了当前类及其所有超类的可见方法字节码在内存中的直接地址。下图是上面源代码中Father和Sun类在方法区中的方法表：<br><img src="http://i.imgur.com/JklSoPK.jpg，“方法区”" alt=""><br>上图中的方法表有两个特点：(1) 子类方法表中继承了父类的方法，比如Father extends Object。 (2) 相同的方法(相同的方法签名：方法名和参数列表)在所有类的方法表中的索引相同。比如Father方法表中的f1()和Son方法表中的f1()都位于各自方法表的第11项中。</p>
+<p> 对于上面的源代码，编译器首先会把main方法编译成下面的字节码指令：<br><img src="http://i.imgur.com/DXFzY9i.png" alt=""><br>其中invokevirtual指令的详细调用过程是这样的：</p>
+<ol>
+<li><p>invokevirtual指令中的#15指的是AutoCall类的常量池中第15个常量表的索引项。这个常量表(CONSTATN_Methodref_info)记录的是方法f1信息的符号引用(包括f1所在的类名，方法名和返回类型)。JVM会首先根据这个符号引用找到调用方法f1的类的全限定名: hr.test.Father。这是因为调用方法f1的类的对象father声明为Father类型。</p>
+</li>
+<li><p>在Father类型的方法表中查找方法f1，如果找到，则将方法f1在方法表中的索引项11(如上图)记录到AutoCall类的常量池中第15个常量表中(常量池解析)。这里有一点要注意：如果Father类型方法表中没有方法f1，那么即使Son类型中方法表有，编译的时候也通过不了。因为调用方法f1的类的对象father的声明为Father类型。</p>
+</li>
+<li><p>在调用invokevirtual指令前有一个aload_1指令，它会将开始创建在堆中的Son对象的引用压入操作数栈。然后invokevirtual指令会根据这个Son对象的引用首先找到堆中的Son对象，然后进一步找到Son对象所属类型的方法表。过程如下图所示：<br><img src="http://i.imgur.com/dz9jETB.png" alt=""></p>
+</li>
+<li>这是通过第2步中解析完成的#15常量表中的方法表的索引项11，可以定位到Son类型方法表中的方法f1()，然后通过直接地址找到该方法字节码所在的内存空间。</li>
+</ol>
+<p>很明显，根据对象(father)的声明类型(Father)还不能够确定调用方法f1的位置，必须根据father在堆中实际创建的对象类型Son来确定f1方法所在的位置。这种在程序运行过程中，通过动态创建的对象的方法表来定位方法的方式，我们叫做动态绑定机制。</p>
+<p>上面的过程很清楚的反映出在方法覆盖的多态调用的情况下，JVM是如何定位到准确的方法的。但是下面的调用方法JVM是如何定位的呢？(仍然使用上面代码中的Father和Son类型)</p>
+<p><img src="http://i.imgur.com/U8pSSxD.png" alt=""><br>问题是Fahter类型中并没有方法签名为f1(char)的方法呀。但打印结果显示JVM调用了Father类型中的f1(int)方法，并没有调用到Son类型中的f1(char)方法。</p>
+<p>根据上面详细阐述的调用过程，首先可以明确的是：JVM首先是根据对象father声明的类型Father来解析常量池的(也就是用Father方法表中的索引项来代替常量池中的符号引用)。如果Father中没有匹配到”合适”的方法，就无法进行常量池解析，这在编译阶段就通过不了。</p>
+<p>那么什么叫”合适”的方法呢？当然，方法签名完全一样的方法自然是合适的。但是如果方法中的参数类型在声明的类型中并不能找到呢？比如上面的代码中调用father.f1(char)，Father类型并没有f1(char)的方法签名。实际上，JVM会找到一种“凑合”的办法，就是通过<strong>参数的自动转型</strong>来找到“合适”的 方法。比如char可以通过自动转型成int，那么Father类中就可以匹配到这个方法了。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
+<li><p>所有私有方法、静态方法、构造器及初始化方法都是采用静态绑定机制。在编译器阶段就已经指明了调用方法在常量池中的符号引用，JVM运行的时候只需要进行一次常量池解析即可。</p>
+</li>
+<li><p>类对象方法的调用必须在运行过程中采用动态绑定机制。</p>
+</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt; &lt;strong&gt;这篇文章主要分析的是JVM方法调用的静态(static binding)和动态绑定机制(auto binding)。&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&quot;静态绑定机制&quot;&gt;&lt;a href=&quot;#静态绑定机制&quot; class=&quot;headerlink&quot; title=&quot;静态绑定机制&quot;&gt;&lt;/a&gt;静态绑定机制&lt;/h3&gt;&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/3ImTwYA.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;上面的源代码中执行方法调用的语句(Father.f1())被编译器编译成了&lt;br&gt;
+    
+    </summary>
+    
+      <category term="JAVA" scheme="http://blog.scorpiodeng.me/categories/JAVA/"/>
+    
+    
+      <category term="笔记" scheme="http://blog.scorpiodeng.me/tags/%E7%AC%94%E8%AE%B0/"/>
+    
+      <category term="J2EE" scheme="http://blog.scorpiodeng.me/tags/J2EE/"/>
+    
+  </entry>
+  
+</feed>
